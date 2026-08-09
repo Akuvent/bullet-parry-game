@@ -1,0 +1,12 @@
+# Local secrets / junk
+.env
+**/.env
+node_modules/
+.DS_Store
+*.log
+
+# Discord studio setup bot (token + local tooling — keep out of the game repo)
+discord-setup/
+
+# Cursor local agent state
+.cursor/
