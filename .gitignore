@@ -13,3 +13,6 @@ discord-setup/
 
 # Local design bible (not shared via git)
 DESIGN.md
+
+# Local / private data
+newsletter-subscribers.csv

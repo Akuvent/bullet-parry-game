@@ -6,19 +6,28 @@ Working title for a 2D one-bullet parry / heat game built in **Godot 4.7**.
 
 ### 1. Install tools
 
-- [Git](https://git-scm.com/downloads)
+- [Git for Windows](https://git-scm.com/download/win) — run the installer, leave **“Git from the command line and also from 3rd-party software”** checked, then **close and reopen** PowerShell
 - [Godot **4.7**](https://godotengine.org/download) (Standard build is enough; match major.minor with `project.godot`)
+
+Check Git works:
+
+```powershell
+git --version
+```
+
+If you see `git is not recognized`, Git isn’t installed or PATH wasn’t updated — reinstall Git, reopen the terminal, try again.
 
 ### 2. Clone
 
-```bash
+```powershell
+cd $HOME
 git clone https://github.com/Akuvent/bullet-parry-game.git
 cd bullet-parry-game
 ```
 
 If you already have a clone:
 
-```bash
+```powershell
 git pull origin master
 ```
 
@@ -32,7 +41,7 @@ Game code lives under `bpg-project/` (`scenes/`, `scripts/`, `autoload/`, etc.).
 
 ### 4. Daily workflow
 
-```bash
+```powershell
 git pull origin master
 # …edit in Godot…
 git add .
@@ -42,7 +51,7 @@ git push origin master
 
 Prefer a feature branch if several people push at once:
 
-```bash
+```powershell
 git checkout -b your-name/short-topic
 git push -u origin your-name/short-topic
 ```
