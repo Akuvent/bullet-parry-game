@@ -10,3 +10,6 @@ discord-setup/
 
 # Cursor local agent state
 .cursor/
+
+# Local design bible (not shared via git)
+DESIGN.md
