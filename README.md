@@ -65,3 +65,15 @@ Then open a PR on GitHub.
 - After first open, Godot may generate `.godot/` locally — that folder stays ignored.
 
 Need access? Ask a repo admin for write permission on [Akuvent/bullet-parry-game](https://github.com/Akuvent/bullet-parry-game).
+
+## License / rights
+
+**Copyright © 2026 Cliffwake — All rights reserved.** See [`LICENSE`](LICENSE).
+
+This is a proprietary project. Public visibility on GitHub does **not** mean
+you may copy, ship, modify, or reuse the game without written permission from
+Cliffwake. Authorized collaborators may work in this repo under that permission
+only.
+
+Note: a `LICENSE` file clarifies ownership; it does not stop someone from
+technically cloning a public repo. Legal use still requires Cliffwake’s permission.
