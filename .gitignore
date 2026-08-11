@@ -6,6 +6,8 @@ node_modules/
 Thumbs.db
 **/Thumbs.db
 *.log
+*.TMP
+*.tmp
 
 # Discord studio setup bot (token + local tooling — keep out of the game repo)
 discord-setup/

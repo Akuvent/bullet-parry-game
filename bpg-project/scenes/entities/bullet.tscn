@@ -6,15 +6,15 @@
 radius = 4.0
 height = 8.0
 
-[node name="Bullet" type="CharacterBody2D"]
+[node name="Bullet" type="CharacterBody2D" unique_id=2031324515]
 collision_layer = 4
 collision_mask = 9
 motion_mode = 1
 script = ExtResource("1_bullet")
 
-[node name="CollisionShape2D" type="CollisionShape2D" parent="."]
+[node name="CollisionShape2D" type="CollisionShape2D" parent="." unique_id=1738052205]
 shape = SubResource("CapsuleShape2D_ur6hh")
 
-[node name="Polygon2D" type="Polygon2D" parent="."]
+[node name="Polygon2D" type="Polygon2D" parent="." unique_id=1499206669]
 position = Vector2(-4, 0)
 polygon = PackedVector2Array(0, 0, 1, -2, 2, -3, 4, -4, 6, -3, 7, -2, 8, 0, 7, 2, 6, 3, 4, 4, 2, 3, 1, 2)
