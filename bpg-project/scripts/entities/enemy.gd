@@ -3,3 +3,7 @@ extends CharacterBody2D
 
 func _ready() -> void:
 	add_to_group("enemies")
+
+
+func hurt():
+	self.queue_free()

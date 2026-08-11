@@ -1,38 +1,64 @@
 extends CharacterBody2D
 ## Player: move (speed tied to heat) + parry on bullet return.
+
+#region Config
 var bullet_scene := preload("res://scenes/entities/bullet.tscn")
 var bullet = bullet_scene.instantiate()
-var speed : float = Heat.heat
+var speed: float = 100
 const JUMP_VELOCITY = -800.0
 ## How long to hold the land pose (seconds). Bump if it still feels snappy.
 const LAND_HOLD := 0.2
+@export var facing_right := true
+#endregion
+
+#region Node refs
 @onready var sprite = $AnimatedSprite2D
 @onready var muzzle: Marker2D = $Muzzle
-@export var facing_right := true
-var can_shoot = true
+#endregion
+
+#region State
 ## Editor position is for facing right; X is mirrored when facing left.
 var _muzzle_offset := Vector2.ZERO
+var can_shoot = true
+var bullet_left := true
+## Floor state sampled at the start of the physics frame (before move_and_slide).
 var was_on_floor := true
 var _landing := false
 var _land_timer := 0.0
-var bullet_left := true
+#endregion
 
+
+#region Lifecycle
 func _ready() -> void:
 	_muzzle_offset = muzzle.position
 	_apply_facing()
 
 
 func _physics_process(delta: float) -> void:
-	
+	# Sample floor before we change velocity / slide; landing uses this later.
 	was_on_floor = is_on_floor()
+	if not bullet_left:
+		speed = maxf(bullet.speed, 50)
+	_apply_gravity_and_jump(delta)
+	_apply_horizontal_move()
+	_try_fire()
 
+	move_and_slide()
+	_update_anims(delta)
+#endregion
+
+
+#region Movement
+func _apply_gravity_and_jump(delta: float) -> void:
 	if not was_on_floor:
 		velocity += get_gravity() * delta
 
 	if Input.is_action_just_pressed("move_up") and was_on_floor:
 		velocity.y = JUMP_VELOCITY
 		_landing = false
-	
+
+
+func _apply_horizontal_move() -> void:
 	var direction := Input.get_axis("move_left", "move_right")
 	if direction:
 		var move_speed := speed * 1.5 if Input.is_action_pressed("run") else speed
@@ -41,17 +67,20 @@ func _physics_process(delta: float) -> void:
 		_apply_facing()
 	else:
 		velocity.x = move_toward(velocity.x, 0, speed)
-	
+#endregion
+
+
+#region Combat
+func _try_fire() -> void:
 	if Input.is_action_just_pressed("fire") and bullet_left and can_shoot:
 		bullet.global_position = muzzle.global_position
 		get_tree().current_scene.add_child(bullet)
 		bullet.setup(self)
 		bullet_left = false
-
-	move_and_slide()
-	_update_anims(delta)
+#endregion
 
 
+#region Facing
 func _apply_facing() -> void:
 	# Art faces right by default; flip when looking left.
 	sprite.flip_h = not facing_right
@@ -59,10 +88,12 @@ func _apply_facing() -> void:
 		_muzzle_offset.x if facing_right else -_muzzle_offset.x,
 		_muzzle_offset.y
 	)
+#endregion
 
 
 #region Animation
 func _update_anims(delta: float) -> void:
+	# Just landed this frame.
 	if is_on_floor() and not was_on_floor:
 		_landing = true
 		can_shoot = false

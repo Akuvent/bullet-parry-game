@@ -4,8 +4,19 @@
 
 [sub_resource type="CircleShape2D" id="CircleShape2D_ur6hh"]
 
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_ur6hh"]
+
 [node name="Enemy" type="CharacterBody2D" unique_id=1137368567]
+collision_layer = 8
+collision_mask = 0
 script = ExtResource("1_enemy")
 
-[node name="CollisionShape2D" type="CollisionShape2D" parent="." unique_id=1822109495]
+[node name="EnemyCollision" type="CollisionShape2D" parent="." unique_id=1822109495]
 shape = SubResource("CircleShape2D_ur6hh")
+
+[node name="Hurtbox" type="Area2D" parent="." unique_id=761568300]
+collision_layer = 128
+collision_mask = 4
+
+[node name="HurtboxCollision" type="CollisionShape2D" parent="Hurtbox" unique_id=1666491537]
+shape = SubResource("RectangleShape2D_ur6hh")
