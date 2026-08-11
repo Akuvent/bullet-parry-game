@@ -1,2 +1,2 @@
-extends Node
-## Boot / entry — routes into hub or a test arena during prototyping.
+extends Node2D
+## Boot / playable entry — prototype arena lives here for now.
