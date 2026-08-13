@@ -9,7 +9,7 @@ Thumbs.db
 *.TMP
 *.tmp
 
-# Discord studio setup bot (token + local tooling — keep out of the game repo)
+# Discord studio setup bot (token + local tooling - keep out of the game repo)
 discord-setup/
 
 # Cursor local agent state

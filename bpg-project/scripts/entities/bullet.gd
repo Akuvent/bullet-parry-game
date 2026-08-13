@@ -140,7 +140,7 @@ func _resolve_collision(collision: KinematicCollision2D) -> void:
 
 #region Targeting
 func find_target() -> void:
-	# Refresh — enemies queue_free() on hurt, so a cached list goes stale.
+	# Refresh - enemies queue_free() on hurt, so a cached list goes stale.
 	targets = get_tree().get_nodes_in_group("enemies")
 	best_distance = INF
 	seek_target = null
@@ -192,7 +192,7 @@ func _get_path():
 		return
 	var bullet_cell = Game.world_to_cell(global_position)
 	var target_cell = Game.world_to_cell(seek_target.global_position)
-	# Out-of-bounds fails silently — the grid region only spans the painted tiles.
+	# Out-of-bounds fails silently - the grid region only spans the painted tiles.
 	if not Game.astar_grid.is_in_boundsv(bullet_cell) or not Game.astar_grid.is_in_boundsv(target_cell):
 		return
 	path = Game.astar_grid.get_point_path(bullet_cell, target_cell)
@@ -200,7 +200,7 @@ func _get_path():
 		path.clear()
 		return
 
-	# path[0] is our own cell centre, which is behind us — start at path[1].
+	# path[0] is our own cell centre, which is behind us - start at path[1].
 	var shortened_path: PackedVector2Array
 	shortened_path.append(path[1])
 	if path.size() >= 3:

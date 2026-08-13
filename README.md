@@ -6,7 +6,7 @@ Working title for a 2D one-bullet parry / heat game built in **Godot 4.7**.
 
 ### 1. Install tools
 
-- [Git for Windows](https://git-scm.com/download/win) — run the installer, leave **“Git from the command line and also from 3rd-party software”** checked, then **close and reopen** PowerShell
+- [Git for Windows](https://git-scm.com/download/win) - run the installer, leave **“Git from the command line and also from 3rd-party software”** checked, then **close and reopen** PowerShell
 - [Godot **4.7**](https://godotengine.org/download) (Standard build is enough; match major.minor with `project.godot`)
 
 Check Git works:
@@ -15,7 +15,7 @@ Check Git works:
 git --version
 ```
 
-If you see `git is not recognized`, Git isn’t installed or PATH wasn’t updated — reinstall Git, reopen the terminal, try again.
+If you see `git is not recognized`, Git isn’t installed or PATH wasn’t updated - reinstall Git, reopen the terminal, try again.
 
 ### 2. Clone
 
@@ -62,13 +62,13 @@ Then open a PR on GitHub.
 
 - Do **not** commit `.env`, tokens, or local secrets.
 - `discord-setup/` is studio Discord tooling and is **not** part of this game repo (ignored / local only).
-- After first open, Godot may generate `.godot/` locally — that folder stays ignored.
+- After first open, Godot may generate `.godot/` locally - that folder stays ignored.
 
 Need access? Ask a repo admin for write permission on [Akuvent/bullet-parry-game](https://github.com/Akuvent/bullet-parry-game).
 
 ## License / rights
 
-**Copyright © 2026 Cliffwake — All rights reserved.** See [`LICENSE`](LICENSE).
+**Copyright © 2026 Cliffwake - All rights reserved.** See [`LICENSE`](LICENSE).
 
 This is a proprietary project. Public visibility on GitHub does **not** mean
 you may copy, ship, modify, or reuse the game without written permission from

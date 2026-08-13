@@ -3,7 +3,7 @@ extends Node
 ## Prototype: tiny hub with two doors; instant restart on fail.
 
 #region Navigation
-## Shared by every bullet — built once per level, never per spawn.
+## Shared by every bullet - built once per level, never per spawn.
 var astar_grid: AStarGrid2D
 var world_tiles: TileMapLayer
 
@@ -18,7 +18,7 @@ func build_grid(tiles: TileMapLayer):
 	var grow_region = world_tiles.get_used_rect().grow(4)
 	astar_grid.region = grow_region
 	astar_grid.cell_size = Vector2(64, 64)
-	# Half a cell, so path points land on cell centres instead of corners —
+	# Half a cell, so path points land on cell centres instead of corners -
 	# corners are shared with diagonal walls and break line-of-sight tests.
 	astar_grid.offset = Vector2(32, 32)
 	astar_grid.update()
