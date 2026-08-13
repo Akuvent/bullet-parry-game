@@ -172,9 +172,6 @@ func _get_path():
 		return
 	path = Game.astar_grid.get_point_path(bullet_cell, target_cell)
 	print(bullet_cell, target_cell, path.size())
-	for point in path:
-		to_local(point)
-	queue_redraw()
 
 func _draw():
 	if path.size() >= 2:
