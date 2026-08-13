@@ -157,4 +157,11 @@ func _has_los_to(target: Node2D) -> bool:
 	return hit.is_empty()  # nothing between you and the target point
 
 func _get_path():
-	pass
+	var astar_grid := AStarGrid2D.new()
+	var grow_region = Rect2i(4, 4, 8, 8).grow(4)
+	astar_grid.region = grow_region
+	astar_grid.cell_size = Vector2(16, 16)
+	astar_grid.offset = Vector2(32, 32)
+	astar_grid.update()
+	astar_grid.set_point_solid()
+	
