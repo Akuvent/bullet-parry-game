@@ -319,7 +319,7 @@ position = Vector2(-712, -232)
 [node name="Entities" type="Node" parent="." unique_id=1113823862]
 
 [node name="Enemy4" parent="Entities" unique_id=653455571 instance=ExtResource("4_jyhfs")]
-position = Vector2(-1051, -940)
+position = Vector2(-1051, -932)
 
 [node name="NavMarkers" type="Node" parent="." unique_id=27968298]
 

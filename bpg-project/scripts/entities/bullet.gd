@@ -171,9 +171,11 @@ func _get_path():
 	var bullet_cell = Game.world_to_cell(global_position)
 	var target_cell = Game.world_to_cell(seek_target.global_position)
 	if not Game.astar_grid.is_in_boundsv(bullet_cell) or not Game.astar_grid.is_in_boundsv(target_cell):
-		path.clear()
 		return
 	path = Game.astar_grid.get_point_path(bullet_cell, target_cell)
+	if path.size() < 2:
+		path.clear()
+		return
 	print(path.size())
 	var shortened_path : PackedVector2Array 
 	shortened_path.append(path[1])
@@ -194,3 +196,9 @@ func _draw():
 		local_path.append(to_local(points))
 	if path.size() >= 2:
 		draw_polyline(local_path, Color(0.0, 0.0, 1.0, 1.0))
+
+func _follow(delta) -> bool:
+	if path == null or not path_index:
+		return false
+	_steer_toward(path[path_index])
+	
