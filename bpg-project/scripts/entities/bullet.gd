@@ -25,6 +25,7 @@ var parried: bool = false
 @export var turn_deg_per_sec := 270.0  # tune: lower = wider arcs
 
 var path : PackedVector2Array
+var shortened_path : PackedVector2Array 
 var path_index: int
 var has_los : bool 
 var had_los : bool = true
@@ -172,7 +173,15 @@ func _get_path():
 		path.clear()
 		return
 	path = Game.astar_grid.get_point_path(bullet_cell, target_cell)
-	print(bullet_cell, target_cell, path.size())
+	shortened_path.append(path[0])
+	if path.size() <= 3:
+		for i in range(1, path.size() - 1):
+			var dir_in := (path[i] - path[i - 1]).normalized()
+			var dir_out := (path[i + 1] - path[i]).normalized()
+			if not dir_in.is_equal_approx(dir_out):
+				shortened_path.append(path[i])
+	shortened_path.append(path[-1])
+		print(bullet_cell, target_cell, path.size())
 
 func _draw():
 	var local_path : PackedVector2Array
