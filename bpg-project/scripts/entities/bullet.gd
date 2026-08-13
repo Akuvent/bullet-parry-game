@@ -174,6 +174,9 @@ func _get_path():
 	print(bullet_cell, target_cell, path.size())
 
 func _draw():
+	var local_points : PackedVector2Array
+	for points in path:
+		local_points.append(to_local(points))
 	if path.size() >= 2:
 		draw_polyline(path, Color(0.0, 0.0, 1.0, 1.0))
 	
