@@ -157,4 +157,4 @@ func _has_los_to(target: Node2D) -> bool:
 	return hit.is_empty()  # nothing between you and the target point
 
 func _path_around():
-	
+	pass
