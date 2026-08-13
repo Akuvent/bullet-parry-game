@@ -39,6 +39,7 @@ func _physics_process(delta: float) -> void:
 	was_on_floor = is_on_floor()
 	if not bullet_left:
 		speed = maxf(bullet.speed, 50)
+
 	_apply_gravity_and_jump(delta)
 	_apply_horizontal_move()
 	_try_fire()

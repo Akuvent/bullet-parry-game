@@ -12,3 +12,4 @@ func build_grid(world_tiles):
 	astar_grid.update()
 	for cell in world_tiles.get_used_cells():
 		astar_grid.set_point_solid(cell, true)
+	astar_grid.get_point_data_in_region(grow_region)
