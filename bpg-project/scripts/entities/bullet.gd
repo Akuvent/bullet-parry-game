@@ -32,7 +32,6 @@ func _ready() -> void:
 func _physics_process(delta: float) -> void:
 	speed = Heat.heat
 	tracking(delta)
-	print(State.keys()[state],': ',state)
 
 
 func setup(p) -> void:
@@ -157,5 +156,7 @@ func _has_los_to(target: Node2D) -> bool:
 	return hit.is_empty()  # nothing between you and the target point
 
 func _get_path():
-	pass
+	if not (Game.astar_grid or seek_target):
+		return
 	
+	print(Game.world_to_cell(global_position))
