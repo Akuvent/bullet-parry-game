@@ -52,7 +52,7 @@ func tracking(delta: float) -> void:
 				if _has_los_to(seek_target):
 					_steer_toward(seek_target.global_position, delta)
 				else:
-					_path_around()
+					_get_path()
 		State.RETURN, State.AWAIT_PARRY:
 			# Keep velocity so the bullet flies past the player (no re-aim each frame).
 			pass
@@ -156,5 +156,5 @@ func _has_los_to(target: Node2D) -> bool:
 	var hit := space.intersect_ray(query)
 	return hit.is_empty()  # nothing between you and the target point
 
-func _path_around():
+func _get_path():
 	pass
