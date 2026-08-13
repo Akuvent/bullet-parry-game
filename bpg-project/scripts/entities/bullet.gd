@@ -180,5 +180,3 @@ func _draw():
 		local_path.append(to_local(points))
 	if path.size() >= 2:
 		draw_polyline(local_path, Color(0.0, 0.0, 1.0, 1.0))
-		print(local_path)
-	
