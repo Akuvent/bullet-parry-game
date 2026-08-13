@@ -8,4 +8,6 @@ func _ready():
 func _physics_process(delta):
 	if Input.is_action_just_pressed("grapple"):
 		print("actual tiles", world_tiles.get_used_cells().size())
-		print()
+		var grow_region = Rect2i(4, 4, 8, 8).grow(4)
+		var a = Game.astar_grid.get_point_data_in_region(grow_region)
+		draw_rect(a, Vector2(64, 64), Color(1, 0, 0, 0.35), true)
