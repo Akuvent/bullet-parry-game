@@ -164,7 +164,7 @@ func _has_los_to(target: Node2D) -> bool:
 	return hit.is_empty()  # nothing between you and the target point
 	
 func _get_path():
-	if not (Game.astar_grid or seek_target):
+	if Game.astar_grid == null or not is_instance_valid(seek_target):
 		return
 	var bullet_cell = Game.world_to_cell(global_position)
 	var target_cell = Game.world_to_cell(seek_target.global_position)
@@ -172,3 +172,12 @@ func _get_path():
 		return
 	path = Game.astar_grid.get_point_path(bullet_cell, target_cell)
 	print(bullet_cell, target_cell, path.size())
+	for point in path:
+		to_local(point)
+	queue_redraw()
+
+func _draw():
+	if path.size() >= 2:
+		draw_polyline(path, Color(0.0, 0.0, 1.0, 1.0))
+	
+	
