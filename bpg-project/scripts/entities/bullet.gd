@@ -38,7 +38,7 @@ func _physics_process(delta: float) -> void:
 	if is_instance_valid(seek_target):
 		has_los = _has_los_to(seek_target)
 	tracking(delta)
-	
+	queue_redraw()
 
 func setup(p) -> void:
 	player = p
@@ -169,15 +169,16 @@ func _get_path():
 	var bullet_cell = Game.world_to_cell(global_position)
 	var target_cell = Game.world_to_cell(seek_target.global_position)
 	if not Game.astar_grid.is_in_boundsv(bullet_cell) or not Game.astar_grid.is_in_boundsv(target_cell):
+		path.clear()
 		return
 	path = Game.astar_grid.get_point_path(bullet_cell, target_cell)
 	print(bullet_cell, target_cell, path.size())
 
 func _draw():
-	var local_points : PackedVector2Array
+	var local_path : PackedVector2Array
 	for points in path:
-		local_points.append(to_local(points))
+		local_path.append(to_local(points))
 	if path.size() >= 2:
-		draw_polyline(path, Color(0.0, 0.0, 1.0, 1.0))
+		draw_polyline(local_path, Color(0.0, 0.0, 1.0, 1.0))
 	
 	
