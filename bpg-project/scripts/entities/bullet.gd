@@ -26,7 +26,7 @@ var parried: bool = false
 
 var path : PackedVector2Array
 var path_index: int
-var has_los : bool
+var has_los : bool 
 
 #region Lifecycle
 func _ready() -> void:
@@ -162,7 +162,7 @@ func _has_los_to(target: Node2D) -> bool:
 func _get_path():
 	if not (Game.astar_grid or seek_target):
 		return
-	Game.world_to_cell(global_position)
-	if is_instance_valid(seek_target):
-		print(Game.world_to_cell(seek_target.global_position))
-	
+	var bullet_cell = Game.world_to_cell(global_position)
+	var target_cell = Game.world_to_cell(seek_target.global_position)
+	if not Game.astar_grid.is_in_boundsv(bullet_cell) or not Game.astar_grid.is_in_boundsv(target_cell):
+		return
