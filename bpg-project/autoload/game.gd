@@ -18,3 +18,4 @@ func build_grid(tiles: TileMapLayer):
 func world_to_cell(global_pos: Vector2) -> Vector2i:
 	var cell := world_tiles.local_to_map(world_tiles.to_local(global_pos))
 	return cell
+	

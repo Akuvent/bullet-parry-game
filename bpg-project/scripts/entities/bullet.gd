@@ -34,7 +34,8 @@ func _ready() -> void:
 
 func _physics_process(delta: float) -> void:
 	speed = Heat.heat
-	has_los = _has_los_to(seek_target)
+	if is_instance_valid(seek_target):
+		has_los = _has_los_to(seek_target)
 	tracking(delta)
 	
 
@@ -166,3 +167,5 @@ func _get_path():
 	var target_cell = Game.world_to_cell(seek_target.global_position)
 	if not Game.astar_grid.is_in_boundsv(bullet_cell) or not Game.astar_grid.is_in_boundsv(target_cell):
 		return
+	path = Game.astar_grid.get_point_path(bullet_cell, target_cell)
+	print(bullet_cell, target_cell, path.size())
