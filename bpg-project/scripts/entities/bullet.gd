@@ -23,11 +23,11 @@ var parried: bool = false
 
 @export var parry_window_sec := 0.4
 @export var turn_deg_per_sec := 270.0  # tune: lower = wider arcs
+@onready var world_tiles: TileMapLayer = $WorldTiles
 
 #region Lifecycle
 func _ready() -> void:
 	motion_mode = MOTION_MODE_FLOATING
-
 
 func _physics_process(delta: float) -> void:
 	speed = Heat.heat
@@ -163,5 +163,6 @@ func _get_path():
 	astar_grid.cell_size = Vector2(16, 16)
 	astar_grid.offset = Vector2(32, 32)
 	astar_grid.update()
-	astar_grid.set_point_solid()
+	for cell in world_tiles.get_used_cells():
+		astar_grid.set_point_solid(cell, true)
 	
