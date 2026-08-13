@@ -6,13 +6,18 @@ enum State { OUTBOUND, RETURN, AWAIT_PARRY, MISSED }
 var state: State = State.OUTBOUND
 #endregion
 
+
 #region Config / refs
+@export var parry_window_sec := 0.4
+@export var turn_deg_per_sec := 270.0  # tune: lower = wider arcs
+
 var speed: float = Heat.heat
 var player: Node2D  # set in setup()
 ## Locked enemy while outbound.
 var seek_target: Node2D
 var targets := []
 #endregion
+
 
 #region Targeting scratch
 ## Reused by find_target(); best_distance starts at INF each search only if reset.
@@ -21,17 +26,22 @@ var distance: float = INF
 var parried: bool = false
 #endregion
 
-@export var parry_window_sec := 0.4
-@export var turn_deg_per_sec := 270.0  # tune: lower = wider arcs
 
-var path : PackedVector2Array
+#region Pathfinding state
+## Waypoints in global coords, pruned to direction changes. Stale between repaths.
+var path: PackedVector2Array
 var path_index: int
-var has_los : bool 
-var had_los : bool = true
+## Sampled once per frame so tracking() and the repath trigger agree on one value.
+var has_los: bool
+## Previous frame's has_los, kept for the "LOS just broke" repath edge trigger.
+var had_los: bool = true
+#endregion
+
 
 #region Lifecycle
 func _ready() -> void:
 	motion_mode = MOTION_MODE_FLOATING
+
 
 func _physics_process(delta: float) -> void:
 	speed = Heat.heat
@@ -39,6 +49,7 @@ func _physics_process(delta: float) -> void:
 		has_los = _has_los_to(seek_target.global_position)
 	tracking(delta)
 	queue_redraw()
+
 
 func setup(p) -> void:
 	player = p
@@ -50,16 +61,14 @@ func setup(p) -> void:
 
 
 #region Movement
+## Per-state steering, then the single move_and_collide for the frame.
 func tracking(delta: float) -> void:
 	match state:
 		State.OUTBOUND:
 			if is_instance_valid(seek_target):
 				if has_los:
 					_steer_toward(seek_target.global_position, delta)
-				elif had_los:
-					# Edge trigger: repath only on the frame LOS breaks, not every frame after.
-					_get_path()
-				else: 
+				else:
 					_get_path()
 				had_los = has_los
 		State.RETURN, State.AWAIT_PARRY:
@@ -96,6 +105,17 @@ func _steer_toward(goal: Vector2, delta: float) -> void:
 	var max_turn := deg_to_rad(turn_deg_per_sec) * delta
 	delta_angle = clampf(delta_angle, -max_turn, max_turn)
 	velocity = current.rotated(delta_angle) * speed
+
+
+## Steer at the current waypoint. Not called from tracking() yet.
+## Unfinished: nothing advances path_index, so this holds on waypoint 0 forever.
+## Arrival radius has to clear one frame of travel (~17 px at speed 1000) and
+## the ~212 px minimum turn radius (speed / turn_deg_per_sec in rad).
+func _follow(delta: float) -> bool:
+	if path.is_empty() or path_index >= path.size():
+		return false
+	_steer_toward(path[path_index], delta)
+	return true
 
 
 func _resolve_collision(collision: KinematicCollision2D) -> void:
@@ -153,9 +173,8 @@ func check_parry_window() -> void:
 #endregion
 
 
-func play_vfx():
-	pass # To be used later
-	
+#region Pathfinding
+## Takes a Vector2 rather than a node so waypoints can be tested too.
 func _has_los_to(target: Vector2) -> bool:
 	var space := get_world_2d().direct_space_state
 	var query := PhysicsRayQueryParameters2D.create(global_position, target)
@@ -164,20 +183,25 @@ func _has_los_to(target: Vector2) -> bool:
 	query.exclude = [self]
 	var hit := space.intersect_ray(query)
 	return hit.is_empty()  # nothing between you and the target point
-	
+
+
+## Rebuild `path` from the shared grid, pruned to the points where it bends.
+## Every early return leaves the previous path in place rather than clearing it.
 func _get_path():
 	if Game.astar_grid == null or not is_instance_valid(seek_target):
 		return
 	var bullet_cell = Game.world_to_cell(global_position)
 	var target_cell = Game.world_to_cell(seek_target.global_position)
+	# Out-of-bounds fails silently — the grid region only spans the painted tiles.
 	if not Game.astar_grid.is_in_boundsv(bullet_cell) or not Game.astar_grid.is_in_boundsv(target_cell):
 		return
 	path = Game.astar_grid.get_point_path(bullet_cell, target_cell)
 	if path.size() < 2:
 		path.clear()
 		return
-	print(path.size())
-	var shortened_path : PackedVector2Array 
+
+	# path[0] is our own cell centre, which is behind us — start at path[1].
+	var shortened_path: PackedVector2Array
 	shortened_path.append(path[1])
 	if path.size() >= 3:
 		for i in range(2, path.size() - 1):
@@ -187,18 +211,22 @@ func _get_path():
 				shortened_path.append(path[i])
 	shortened_path.append(path[-1])
 	path = shortened_path
-	print(path.size())
+	path_index = 0
 	print(bullet_cell, target_cell, path.size())
+#endregion
 
+
+#region FX
+func play_vfx():
+	pass # To be used later
+#endregion
+
+
+#region Debug
 func _draw():
-	var local_path : PackedVector2Array
+	var local_path: PackedVector2Array
 	for points in path:
 		local_path.append(to_local(points))
 	if path.size() >= 2:
 		draw_polyline(local_path, Color(0.0, 0.0, 1.0, 1.0))
-
-func _follow(delta) -> bool:
-	if path == null or not path_index:
-		return false
-	_steer_toward(path[path_index])
-	
+#endregion
