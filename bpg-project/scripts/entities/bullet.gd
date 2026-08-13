@@ -36,7 +36,7 @@ func _ready() -> void:
 func _physics_process(delta: float) -> void:
 	speed = Heat.heat
 	if is_instance_valid(seek_target):
-		has_los = _has_los_to(seek_target)
+		has_los = _has_los_to(seek_target.global_position)
 	tracking(delta)
 	queue_redraw()
 
@@ -130,7 +130,7 @@ func find_target() -> void:
 		distance = enemy.global_position.distance_to(global_position)
 		if distance < best_distance:
 			best_distance = distance
-			seek_target = enemy.global_position
+			seek_target = enemy
 
 
 func check_parry_window() -> void:
