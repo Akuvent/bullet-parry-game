@@ -24,6 +24,9 @@ var parried: bool = false
 @export var parry_window_sec := 0.4
 @export var turn_deg_per_sec := 270.0  # tune: lower = wider arcs
 
+var path : PackedVector2Array
+var path_index: int
+var has_los : bool
 
 #region Lifecycle
 func _ready() -> void:
@@ -31,8 +34,9 @@ func _ready() -> void:
 
 func _physics_process(delta: float) -> void:
 	speed = Heat.heat
+	has_los = _has_los_to(seek_target)
 	tracking(delta)
-
+	
 
 func setup(p) -> void:
 	player = p
@@ -48,7 +52,7 @@ func tracking(delta: float) -> void:
 	match state:
 		State.OUTBOUND:
 			if is_instance_valid(seek_target):
-				if _has_los_to(seek_target):
+				if has_los:
 					_steer_toward(seek_target.global_position, delta)
 				else:
 					_get_path()
@@ -154,7 +158,7 @@ func _has_los_to(target: Node2D) -> bool:
 	query.exclude = [self]
 	var hit := space.intersect_ray(query)
 	return hit.is_empty()  # nothing between you and the target point
-
+	
 func _get_path():
 	if not (Game.astar_grid or seek_target):
 		return
