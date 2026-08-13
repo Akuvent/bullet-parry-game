@@ -15,8 +15,16 @@ discord-setup/
 # Cursor local agent state
 .cursor/
 
+# Local auto-commit safety net (per-machine, not shared)
+.cursor-autocommit/
+
 # Local design bible (not shared via git)
 DESIGN.md
 
 # Local / private data
 newsletter-subscribers.csv
+
+# Artist brief / palette (local deliverables, not for the game repo)
+docs/
+palette-options.css
+palette-neon-lock-on.pdf
