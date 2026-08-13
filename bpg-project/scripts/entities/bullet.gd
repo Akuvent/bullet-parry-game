@@ -158,5 +158,7 @@ func _has_los_to(target: Node2D) -> bool:
 func _get_path():
 	if not (Game.astar_grid or seek_target):
 		return
+	Game.world_to_cell(global_position)
+	if is_instance_valid(seek_target):
+		print(Game.world_to_cell(seek_target.global_position))
 	
-	print(Game.world_to_cell(global_position))
