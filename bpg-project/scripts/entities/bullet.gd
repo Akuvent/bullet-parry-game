@@ -27,6 +27,7 @@ var parried: bool = false
 var path : PackedVector2Array
 var path_index: int
 var has_los : bool 
+var had_los : bool = true
 
 #region Lifecycle
 func _ready() -> void:
@@ -55,8 +56,10 @@ func tracking(delta: float) -> void:
 			if is_instance_valid(seek_target):
 				if has_los:
 					_steer_toward(seek_target.global_position, delta)
-				else:
+				elif had_los:
+					# Edge trigger: repath only on the frame LOS breaks, not every frame after.
 					_get_path()
+				had_los = has_los
 		State.RETURN, State.AWAIT_PARRY:
 			# Keep velocity so the bullet flies past the player (no re-aim each frame).
 			pass
