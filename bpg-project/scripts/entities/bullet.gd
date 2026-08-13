@@ -130,7 +130,7 @@ func find_target() -> void:
 		distance = enemy.global_position.distance_to(global_position)
 		if distance < best_distance:
 			best_distance = distance
-			seek_target = enemy
+			seek_target = enemy.global_position
 
 
 func check_parry_window() -> void:
@@ -156,9 +156,9 @@ func check_parry_window() -> void:
 func play_vfx():
 	pass # To be used later
 	
-func _has_los_to(target: Node2D) -> bool:
+func _has_los_to(target: Vector2) -> bool:
 	var space := get_world_2d().direct_space_state
-	var query := PhysicsRayQueryParameters2D.create(global_position, target.global_position)
+	var query := PhysicsRayQueryParameters2D.create(global_position, target)
 	query.collide_with_areas = false
 	query.collision_mask = 1 # world
 	query.exclude = [self]
