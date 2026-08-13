@@ -23,7 +23,7 @@ var parried: bool = false
 
 @export var parry_window_sec := 0.4
 @export var turn_deg_per_sec := 270.0  # tune: lower = wider arcs
-@onready var world_tiles: TileMapLayer = $WorldTiles
+@onready var world_tiles: TileMapLayer = get_tree().current_scene.get_node("WorldTiles")
 
 #region Lifecycle
 func _ready() -> void:
