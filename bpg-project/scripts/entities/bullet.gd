@@ -9,7 +9,8 @@ var state: State = State.OUTBOUND
 
 #region Config / refs
 @export var parry_window_sec := 0.4
-@export var turn_deg_per_sec := 270.0  # tune: lower = wider arcs
+@export var turn_deg_per_sec := 720.0   # tune: lower = wider arcs
+@export var path_arrive_radius := 50.0
 
 var speed: float = Heat.heat
 var player: Node2D  # set in setup()
@@ -69,7 +70,10 @@ func tracking(delta: float) -> void:
 				if has_los:
 					_steer_toward(seek_target.global_position, delta)
 				else:
-					_get_path()
+					if had_los:
+						_get_path()
+					if not _follow(delta):
+						_steer_toward(seek_target.global_position, delta)
 				had_los = has_los
 		State.RETURN, State.AWAIT_PARRY:
 			# Keep velocity so the bullet flies past the player (no re-aim each frame).
@@ -115,6 +119,13 @@ func _follow(delta: float) -> bool:
 	if path.is_empty() or path_index >= path.size():
 		return false
 	_steer_toward(path[path_index], delta)
+	var waypoint := path[path_index]
+	var passed := false
+	if path_index > 0:
+		var leg := path[path_index] - path[path_index - 1]
+		passed = (global_position - waypoint).dot(leg) > 0.0
+	if global_position.distance_to(waypoint) < path_arrive_radius or passed:
+		path_index += 1
 	return true
 
 
@@ -229,4 +240,8 @@ func _draw():
 		local_path.append(to_local(points))
 	if path.size() >= 2:
 		draw_polyline(local_path, Color(0.0, 0.0, 1.0, 1.0))
+	if path.is_empty():
+		return
+	if path_index >= 0 and path_index < path.size():
+		draw_circle(to_local(path[path_index]), 10.0, Color(0.0, 1.0, 0.376, 1.0))
 #endregion
