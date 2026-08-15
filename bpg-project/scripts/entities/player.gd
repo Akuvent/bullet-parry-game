@@ -1,30 +1,37 @@
 extends CharacterBody2D
 ## Player: move (speed tied to heat) + parry on bullet return.
+## One live bullet: the instance is created with the player and added to the scene on fire.
 
 #region Config
-var bullet_scene := preload("res://scenes/entities/bullet.tscn")
-var bullet = bullet_scene.instantiate()
-var speed: float = 100
-const JUMP_VELOCITY = -800.0
+var bullet_scene: PackedScene = preload("res://scenes/entities/bullet.tscn")
+const JUMP_VELOCITY: float = -800.0
 ## How long to hold the land pose (seconds). Bump if it still feels snappy.
-const LAND_HOLD := 0.2
-@export var facing_right := true
+const LAND_HOLD: float = 0.2
+@export var facing_right: bool = true
 #endregion
 
+
 #region Node refs
-@onready var sprite = $AnimatedSprite2D
+@onready var sprite: AnimatedSprite2D = $AnimatedSprite2D
 @onready var muzzle: Marker2D = $Muzzle
 #endregion
 
+
 #region State
+## The one bullet; lives on the player until fired, then stays in the world.
+var bullet = bullet_scene.instantiate()
+## Matches bullet speed while the shot is airborne; floor of 50.
+var speed: float = 100
 ## Editor position is for facing right; X is mirrored when facing left.
-var _muzzle_offset := Vector2.ZERO
-var can_shoot = true
-var bullet_left := true
+var _muzzle_offset: Vector2 = Vector2.ZERO
+## False during the land pose so fire doesn't interrupt it.
+var can_shoot: bool = true
+## True until the one bullet is fired (this slice never re-holsters).
+var bullet_left: bool = true
 ## Floor state sampled at the start of the physics frame (before move_and_slide).
-var was_on_floor := true
-var _landing := false
-var _land_timer := 0.0
+var was_on_floor: bool = true
+var _landing: bool = false
+var _land_timer: float = 0.0
 #endregion
 
 

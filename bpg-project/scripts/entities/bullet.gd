@@ -1,39 +1,30 @@
 extends CharacterBody2D
-## Homing bullet: outbound toward locked enemy, bounce on walls, return / await parry.
+## Homing bullet: outbound toward locked enemy, bounce on walls, return / parry / loose.
+## One live instance at a time - spawned and owned by the player.
 
-#region State machine
-enum State { OUTBOUND, RETURN, AWAIT_PARRY, MISSED }
-var state: State = State.OUTBOUND
-#endregion
+enum State { OUTBOUND, RETURN, AWAIT_PARRY, LOOSE }
 
-
-#region Config / refs
+#region Config
 @export var parry_window_sec := 0.4
 @export var turn_deg_per_sec := 720.0   # tune: lower = wider arcs
 @export var path_arrive_radius := 50.0
+#endregion
 
+
+#region State
+var state: State = State.OUTBOUND
+## Copied from Heat each physics frame; player reads this while the shot is airborne.
 var speed: float = Heat.heat
 var player: Node2D  # set in setup()
 ## Locked enemy while outbound.
 var seek_target: Node2D
-var targets := []
-#endregion
-
-
-#region Targeting scratch
-## Reused by find_target(); best_distance starts at INF each search only if reset.
-var best_distance: float = INF
-var distance: float = INF
-var parried: bool = false
-#endregion
-
-
-#region Pathfinding state
+## Live homing point (enemy or player), copied once per frame before steering.
+var pathing_goal: Vector2
 ## Waypoints in global coords, pruned to direction changes. Stale between repaths.
 var path: PackedVector2Array
-var path_index: int
+var path_index: int = 0
 ## Sampled once per frame so tracking() and the repath trigger agree on one value.
-var has_los: bool
+var has_los: bool = false
 ## Previous frame's has_los, kept for the "LOS just broke" repath edge trigger.
 var had_los: bool = true
 #endregion
@@ -45,38 +36,49 @@ func _ready() -> void:
 
 
 func _physics_process(delta: float) -> void:
+	Heat.set_outbound_active(state == State.OUTBOUND)
 	speed = Heat.heat
-	if is_instance_valid(seek_target):
-		has_los = _has_los_to(seek_target.global_position)
+	_refresh_pathing_goal()
 	tracking(delta)
 	queue_redraw()
 
 
-func setup(p) -> void:
+func setup(p: Node2D) -> void:
 	player = p
 	find_target()
 	# One-shot launch; OUTBOUND steering takes over after this.
 	if is_instance_valid(seek_target):
-		_aim_at(seek_target.global_position)
+		pathing_goal = seek_target.global_position
+		_aim_at(pathing_goal)
 #endregion
 
 
 #region Movement
+## Copy the live homing node into pathing_goal and refresh has_los for this frame.
+func _refresh_pathing_goal() -> void:
+	has_los = false
+	match state:
+		State.OUTBOUND:
+			if is_instance_valid(seek_target):
+				pathing_goal = seek_target.global_position
+				has_los = _has_los_to(pathing_goal)
+		State.RETURN:
+			if is_instance_valid(player):
+				pathing_goal = player.global_position
+				has_los = _has_los_to(pathing_goal)
+
+
 ## Per-state steering, then the single move_and_collide for the frame.
 func tracking(delta: float) -> void:
 	match state:
 		State.OUTBOUND:
 			if is_instance_valid(seek_target):
-				if has_los:
-					_steer_toward(seek_target.global_position, delta)
-				else:
-					if had_los:
-						_get_path()
-					if not _follow(delta):
-						_steer_toward(seek_target.global_position, delta)
-				had_los = has_los
-		State.RETURN, State.AWAIT_PARRY:
-			# Keep velocity so the bullet flies past the player (no re-aim each frame).
+				_track_toward_goal(delta)
+		State.RETURN:
+			if is_instance_valid(player):
+				_track_toward_goal(delta)
+		State.AWAIT_PARRY, State.LOOSE:
+			# Fly-through or loose bounce, no homing / pathfollow.
 			pass
 		_:
 			pass
@@ -86,6 +88,17 @@ func tracking(delta: float) -> void:
 		_resolve_collision(collision)
 
 	check_parry_window()
+
+
+func _track_toward_goal(delta: float) -> void:
+	if has_los:
+		_steer_toward(pathing_goal, delta)
+	else:
+		if had_los:
+			_get_path()
+		if not _follow(delta):
+			_steer_toward(pathing_goal, delta)
+	had_los = has_los
 
 
 ## Instant set direction (spawn / return home / parry redirect).
@@ -111,10 +124,7 @@ func _steer_toward(goal: Vector2, delta: float) -> void:
 	velocity = current.rotated(delta_angle) * speed
 
 
-## Steer at the current waypoint. Not called from tracking() yet.
-## Unfinished: nothing advances path_index, so this holds on waypoint 0 forever.
-## Arrival radius has to clear one frame of travel (~17 px at speed 1000) and
-## the ~212 px minimum turn radius (speed / turn_deg_per_sec in rad).
+## Steer at the current waypoint; advance path_index when close or passed.
 func _follow(delta: float) -> bool:
 	if path.is_empty() or path_index >= path.size():
 		return false
@@ -138,8 +148,12 @@ func _resolve_collision(collision: KinematicCollision2D) -> void:
 		collider.hurt()
 		play_vfx()
 		state = State.RETURN
+		path.clear()
+		had_los = true
 		if is_instance_valid(player):
-			_aim_at(player.global_position)
+			pathing_goal = player.global_position
+			if _has_los_to(pathing_goal):
+				_aim_at(pathing_goal)
 		return
 
 	# Walls / geometry.
@@ -150,17 +164,17 @@ func _resolve_collision(collision: KinematicCollision2D) -> void:
 
 
 #region Targeting
+## Nearest living enemy; group membership is the source of truth (hurt() frees them).
 func find_target() -> void:
-	# Refresh - enemies queue_free() on hurt, so a cached list goes stale.
-	targets = get_tree().get_nodes_in_group("enemies")
-	best_distance = INF
+	var targets := get_tree().get_nodes_in_group("enemies")
+	var best_distance: float = INF
 	seek_target = null
 	for enemy in targets:
 		if not is_instance_valid(enemy):
 			continue
-		distance = enemy.global_position.distance_to(global_position)
-		if distance < best_distance:
-			best_distance = distance
+		var dist_to_enemy: float = enemy.global_position.distance_to(global_position)
+		if dist_to_enemy < best_distance:
+			best_distance = dist_to_enemy
 			seek_target = enemy
 
 
@@ -173,14 +187,27 @@ func check_parry_window() -> void:
 	if state == State.RETURN and dist <= parry_radius:
 		state = State.AWAIT_PARRY
 	elif state == State.AWAIT_PARRY and dist > parry_radius:
-		state = State.MISSED
+		state = State.LOOSE
+		path.clear()
+		Heat.set_loose(true)
 
-	if state == State.AWAIT_PARRY and Input.is_action_just_pressed("parry"):
-		find_target()
-		if not is_instance_valid(seek_target):
-			return
-		state = State.OUTBOUND
-		_aim_at(seek_target.global_position)
+	if Input.is_action_just_pressed("parry"):
+		var in_parry_range := dist <= parry_radius
+		if state == State.AWAIT_PARRY or (state == State.LOOSE and in_parry_range):
+			_do_parry()
+
+
+func _do_parry() -> void:
+	Heat.parried()
+	find_target()
+	if not is_instance_valid(seek_target):
+		return
+	path.clear()
+	had_los = true
+	state = State.OUTBOUND
+	Heat.set_loose(false)
+	pathing_goal = seek_target.global_position
+	_aim_at(pathing_goal)
 #endregion
 
 
@@ -198,11 +225,11 @@ func _has_los_to(target: Vector2) -> bool:
 
 ## Rebuild `path` from the shared grid, pruned to the points where it bends.
 ## Every early return leaves the previous path in place rather than clearing it.
-func _get_path():
-	if Game.astar_grid == null or not is_instance_valid(seek_target):
+func _get_path() -> void:
+	if Game.astar_grid == null:
 		return
-	var bullet_cell = Game.world_to_cell(global_position)
-	var target_cell = Game.world_to_cell(seek_target.global_position)
+	var bullet_cell: Vector2i = Game.world_to_cell(global_position)
+	var target_cell: Vector2i = Game.world_to_cell(pathing_goal)
 	# Out-of-bounds fails silently - the grid region only spans the painted tiles.
 	if not Game.astar_grid.is_in_boundsv(bullet_cell) or not Game.astar_grid.is_in_boundsv(target_cell):
 		return
@@ -223,21 +250,20 @@ func _get_path():
 	shortened_path.append(path[-1])
 	path = shortened_path
 	path_index = 0
-	print(bullet_cell, target_cell, path.size())
 #endregion
 
 
 #region FX
-func play_vfx():
+func play_vfx() -> void:
 	pass # To be used later
 #endregion
 
 
 #region Debug
-func _draw():
+func _draw() -> void:
 	var local_path: PackedVector2Array
-	for points in path:
-		local_path.append(to_local(points))
+	for point in path:
+		local_path.append(to_local(point))
 	if path.size() >= 2:
 		draw_polyline(local_path, Color(0.0, 0.0, 1.0, 1.0))
 	if path.is_empty():

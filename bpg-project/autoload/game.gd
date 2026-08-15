@@ -2,20 +2,22 @@ extends Node
 ## Global flow: hub ↔ levels, seamless door transitions, restart hooks.
 ## Prototype: tiny hub with two doors; instant restart on fail.
 
-#region Navigation
+#region State
 ## Shared by every bullet - built once per level, never per spawn.
 var astar_grid: AStarGrid2D
 var world_tiles: TileMapLayer
+#endregion
 
 
+#region Pathfinding
 ## Build the pathfinding grid from the level's wall tiles. Call once, from the
 ## level's _ready.
-func build_grid(tiles: TileMapLayer):
+func build_grid(tiles: TileMapLayer) -> void:
 	world_tiles = tiles
 	astar_grid = AStarGrid2D.new()
 	# get_used_rect() only spans painted cells (the walls), not the open arena,
 	# so entities outside this rect fall out of bounds and can't be pathed to.
-	var grow_region = world_tiles.get_used_rect().grow(4)
+	var grow_region: Rect2i = world_tiles.get_used_rect().grow(4)
 	astar_grid.region = grow_region
 	astar_grid.cell_size = Vector2(64, 64)
 	# Half a cell, so path points land on cell centres instead of corners -
