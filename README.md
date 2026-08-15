@@ -1,6 +1,6 @@
-# Bullet Parry
+# Kinetum: Please Slow Down
 
-Working title for a 2D one-bullet parry / heat game built in **Godot 4.7**.
+2D one-bullet parry / heat game built in **Godot 4.7**.
 
 ## Pull the repo (other devs)
 
@@ -21,8 +21,8 @@ If you see `git is not recognized`, Git isn’t installed or PATH wasn’t updat
 
 ```powershell
 cd $HOME
-git clone https://github.com/Akuvent/bullet-parry-game.git
-cd bullet-parry-game
+git clone https://github.com/Akuvent/kinetum-please-slow-down.git
+cd kinetum-please-slow-down
 ```
 
 If you already have a clone:
@@ -30,6 +30,8 @@ If you already have a clone:
 ```powershell
 git pull origin master
 ```
+
+Old clones of `bullet-parry-game` still work. GitHub redirects the old URL. Run `git remote set-url origin https://github.com/Akuvent/kinetum-please-slow-down.git` if you want the remote name to match.
 
 ### 3. Open the game project
 
@@ -61,10 +63,9 @@ Then open a PR on GitHub.
 ### Notes
 
 - Do **not** commit `.env`, tokens, or local secrets.
-- `discord-setup/` is studio Discord tooling and is **not** part of this game repo (ignored / local only).
 - After first open, Godot may generate `.godot/` locally - that folder stays ignored.
 
-Need access? Ask a repo admin for write permission on [Akuvent/bullet-parry-game](https://github.com/Akuvent/bullet-parry-game).
+Need access? Ask a repo admin for write permission on [Akuvent/kinetum-please-slow-down](https://github.com/Akuvent/kinetum-please-slow-down).
 
 ## License / rights
 
