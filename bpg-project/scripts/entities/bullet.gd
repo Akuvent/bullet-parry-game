@@ -41,7 +41,7 @@ func _physics_process(delta: float) -> void:
 	_refresh_pathing_goal()
 	tracking(delta)
 	queue_redraw()
-
+	print(speed)
 
 func setup(p: Node2D) -> void:
 	player = p
@@ -184,7 +184,7 @@ func check_parry_window() -> void:
 	var parry_radius := speed * parry_window_sec * 0.5
 	var dist := global_position.distance_to(player.global_position)
 	# Enter the window once close enough while returning.
-	if state == State.RETURN and dist <= parry_radius:
+	if state == State.RETURN and dist <= parry_radius and has_los:
 		state = State.AWAIT_PARRY
 	elif state == State.AWAIT_PARRY and dist > parry_radius:
 		state = State.LOOSE

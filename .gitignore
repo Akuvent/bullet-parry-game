@@ -21,6 +21,9 @@ discord-setup/
 # Local design bible (not shared via git)
 DESIGN.md
 
+# Godot addons (local / installed, not tracked)
+bpg-project/addons/
+
 # Local / private data
 newsletter-subscribers.csv
 

@@ -4,6 +4,7 @@ extends Node
 
 #region Config
 @export var outbound_rise_per_sec: float = 100.0
+@export var max_speed: float = 2000
 var heat_loss_per_sec: float = 80
 var fall_threshold: int = 200
 #endregion
@@ -24,6 +25,7 @@ var loose_time: float = 0
 func _process(delta: float) -> void:
 	if is_outbound:
 		heat += outbound_rise_per_sec * delta
+		heat = minf(heat, max_speed)
 	elif is_loose:
 		var ramp: float = 0.8
 		var max_mult: float = 5

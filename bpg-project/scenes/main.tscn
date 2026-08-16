@@ -321,6 +321,9 @@ position = Vector2(-712, -232)
 [node name="Enemy4" parent="Entities" unique_id=653455571 instance=ExtResource("4_jyhfs")]
 position = Vector2(-1289, -184)
 
+[node name="Enemy5" parent="Entities" unique_id=1137368567 instance=ExtResource("4_jyhfs")]
+position = Vector2(-180, -194)
+
 [node name="NavMarkers" type="Node" parent="." unique_id=27968298]
 
 [node name="Marker2D" type="Marker2D" parent="NavMarkers" unique_id=1036856448]
