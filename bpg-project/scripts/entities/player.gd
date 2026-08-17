@@ -4,7 +4,7 @@ extends CharacterBody2D
 
 #region Config
 var bullet_scene: PackedScene = preload("res://scenes/entities/bullet.tscn")
-const JUMP_VELOCITY: float = -800.0
+const JUMP_VELOCITY: float = -600.0
 ## How long to hold the land pose (seconds). Bump if it still feels snappy.
 const LAND_HOLD: float = 0.2
 @export var facing_right: bool = true
@@ -22,6 +22,7 @@ const LAND_HOLD: float = 0.2
 var bullet = bullet_scene.instantiate()
 ## Matches bullet speed while the shot is airborne; floor of 50.
 var speed: float = 100
+var base_speed: float = 100 # for jump mult
 ## Editor position is for facing right; X is mirrored when facing left.
 var _muzzle_offset: Vector2 = Vector2.ZERO
 ## False during the land pose so fire doesn't interrupt it.
@@ -32,6 +33,8 @@ var bullet_left: bool = true
 var was_on_floor: bool = true
 var _landing: bool = false
 var _land_timer: float = 0.0
+var heat_jump_mult: float = 1
+var max_heat_jump_mult: float = 1.5
 #endregion
 
 
@@ -62,7 +65,9 @@ func _apply_gravity_and_jump(delta: float) -> void:
 		velocity += get_gravity() * delta
 
 	if Input.is_action_just_pressed("move_up") and was_on_floor:
-		velocity.y = JUMP_VELOCITY
+		var heat_t := clampf(inverse_lerp(base_speed, Heat.max_speed, speed), 0.0, 1.0)
+		heat_jump_mult = lerpf(1.0, max_heat_jump_mult, sqrt(heat_t))
+		velocity.y = JUMP_VELOCITY * heat_jump_mult
 		_landing = false
 
 
