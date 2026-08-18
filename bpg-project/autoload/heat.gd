@@ -46,7 +46,8 @@ func set_loose(value: bool) -> void:
 
 
 func parried() -> void:
-	heat += 100
+	if heat <= 1901:
+		heat += 100
 
 
 func set_outbound_active(active: bool) -> void:
