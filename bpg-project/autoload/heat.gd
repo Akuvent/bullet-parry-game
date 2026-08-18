@@ -11,7 +11,7 @@ var fall_threshold: int = 200
 
 
 #region State
-var heat: float = 1000.0
+var heat: float = 200
 var is_loose: bool = false
 var is_outbound: bool = false
 ## Ramp applied while loose; persists across frames, reset in set_loose().
@@ -46,7 +46,7 @@ func set_loose(value: bool) -> void:
 
 
 func parried() -> void:
-	heat += 80
+	heat += 100
 
 
 func set_outbound_active(active: bool) -> void:

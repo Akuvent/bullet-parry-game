@@ -1,12 +1,94 @@
-[gd_scene load_steps=2 format=3]
+[gd_scene format=3 uid="uid://dfy1r03qn8xkg"]
 
-[ext_resource type="Script" path="res://scripts/ui/heat_meter.gd" id="1_heat"]
+[ext_resource type="Script" uid="uid://bthx2k7cfum63" path="res://scripts/ui/heat_meter.gd" id="1_heat"]
+[ext_resource type="Shader" uid="uid://dngrw5ux8o8iv" path="res://resources/heat_meter.gdshader" id="2_yb3y8"]
+[ext_resource type="Texture2D" uid="uid://dplcdspkv0caa" path="res://assets/sprites/UI/separators.png" id="3_yb3y8"]
 
-[node name="HeatMeter" type="Control"]
-layout_mode = 3
-anchors_preset = 15
-anchor_right = 1.0
-anchor_bottom = 1.0
-grow_horizontal = 2
-grow_vertical = 2
+[sub_resource type="Gradient" id="Gradient_rv20d"]
+offsets = PackedFloat32Array(0, 0.33333334, 0.6666667, 1)
+colors = PackedColorArray(0.28, 0.28, 0.28, 1, 1, 0.31199998, 0.04000002, 1, 1.0372378, 0, 0, 1, 1, 1, 1, 1)
+metadata/_snap_count = 3
+metadata/_snap_enabled = true
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_bca1b"]
+shader = ExtResource("2_yb3y8")
+shader_parameter/scroll_speed = 0.5
+shader_parameter/cell_size = 5.0
+shader_parameter/min_radius = 0.08
+shader_parameter/max_radius = 0.38
+shader_parameter/darken = 0.75
+shader_parameter/grid_rotation = 35.0
+shader_parameter/move_angle = 180.0
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_ur6hh"]
+border_color = Color(0.805562, 0.7999747, 0.7847777, 1)
+corner_radius_top_left = 8
+corner_radius_top_right = 8
+corner_radius_bottom_right = 8
+corner_radius_bottom_left = 8
+anti_aliasing = false
+
+[sub_resource type="Gradient" id="Gradient_yb3y8"]
+colors = PackedColorArray(0.53333336, 0, 1, 1, 0.13885371, 0.002418908, 0.2171525, 1)
+
+[sub_resource type="GradientTexture2D" id="GradientTexture2D_ur6hh"]
+gradient = SubResource("Gradient_yb3y8")
+fill_from = Vector2(0.46153846, 0.53418803)
+
+[sub_resource type="Gradient" id="Gradient_bca1b"]
+offsets = PackedFloat32Array(0.31939164)
+colors = PackedColorArray(0, 0, 0, 0.78431374)
+
+[sub_resource type="GradientTexture2D" id="GradientTexture2D_s2q4o"]
+gradient = SubResource("Gradient_bca1b")
+width = 480
+height = 25
+fill_from = Vector2(1, 0)
+fill_to = Vector2(0, 1)
+
+[sub_resource type="Gradient" id="Gradient_44n44"]
+offsets = PackedFloat32Array(1)
+colors = PackedColorArray(1, 1, 1, 1)
+
+[sub_resource type="GradientTexture2D" id="GradientTexture2D_yb3y8"]
+gradient = SubResource("Gradient_44n44")
+width = 480
+height = 25
+
+[node name="HeatMeter" type="Node2D" unique_id=742300823]
 script = ExtResource("1_heat")
+gradient = SubResource("Gradient_rv20d")
+
+[node name="PanelContainer" type="PanelContainer" parent="." unique_id=1972428613]
+clip_children = 2
+material = SubResource("ShaderMaterial_bca1b")
+custom_minimum_size = Vector2(500, 40)
+custom_maximum_size = Vector2(500, 40)
+offset_left = -250.0
+offset_top = -20.0
+offset_right = 250.0
+offset_bottom = 20.0
+theme_override_styles/panel = SubResource("StyleBoxFlat_ur6hh")
+
+[node name="TextureRect" type="TextureRect" parent="PanelContainer" unique_id=417979891]
+use_parent_material = true
+custom_minimum_size = Vector2(500, 40)
+custom_maximum_size = Vector2(500, 40)
+layout_mode = 2
+texture = SubResource("GradientTexture2D_ur6hh")
+
+[node name="HeatProgressBar" type="TextureProgressBar" parent="." unique_id=1205157999]
+custom_minimum_size = Vector2(480, 25)
+custom_maximum_size = Vector2(480, 25)
+offset_left = -240.0
+offset_top = -13.0
+offset_right = 240.0
+offset_bottom = 12.0
+size_flags_horizontal = 4
+size_flags_vertical = 4
+min_value = 200.0
+max_value = 2000.0
+value = 200.0
+texture_under = SubResource("GradientTexture2D_s2q4o")
+texture_over = ExtResource("3_yb3y8")
+texture_progress = SubResource("GradientTexture2D_yb3y8")
