@@ -1,17 +1,17 @@
 extends Node
-## Shared heat state: rises on successful parry; drives bullet + player speed.
+## Shared kinetum state: rises on successful parry; drives bullet + player speed.
 ## Cooldown / dump method is still an open design question - keep pluggable.
 
 #region Config
 @export var outbound_rise_per_sec: float = 100.0
 @export var max_speed: float = 2000
-var heat_loss_per_sec: float = 80
+var kinetum_loss_per_sec: float = 80
 var fall_threshold: int = 200
 #endregion
 
 
 #region State
-var heat: float = 200
+var kinetum: float = 200
 var is_loose: bool = false
 var is_outbound: bool = false
 ## Ramp applied while loose; persists across frames, reset in set_loose().
@@ -24,15 +24,15 @@ var loose_time: float = 0
 #region Lifecycle
 func _process(delta: float) -> void:
 	if is_outbound:
-		heat += outbound_rise_per_sec * delta
-		heat = minf(heat, max_speed)
+		kinetum += outbound_rise_per_sec * delta
+		kinetum = minf(kinetum, max_speed)
 	elif is_loose:
 		var ramp: float = 0.8
 		var max_mult: float = 5
 		loose_time += delta
 		dump_mult = minf(1.0 + loose_time * ramp, max_mult)
-		heat -= heat_loss_per_sec * dump_mult * delta
-		heat = maxf(heat, fall_threshold)
+		kinetum -= kinetum_loss_per_sec * dump_mult * delta
+		kinetum = maxf(kinetum, fall_threshold)
 #endregion
 
 
@@ -46,8 +46,8 @@ func set_loose(value: bool) -> void:
 
 
 func parried() -> void:
-	if heat <= 1901:
-		heat += 100
+	if kinetum <= 1901:
+		kinetum += 100
 
 
 func set_outbound_active(active: bool) -> void:

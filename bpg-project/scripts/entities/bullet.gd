@@ -13,14 +13,14 @@ enum State { OUTBOUND, RETURN, AWAIT_PARRY, LOOSE }
 
 #region State
 var state: State = State.OUTBOUND
-## Copied from Heat each physics frame; player reads this while the shot is airborne.
-var speed: float = Heat.heat
+## Copied from Kinetum each physics frame; player reads this while the shot is airborne.
+var speed: float = Kinetum.kinetum
 var player: Node2D  # set in setup()
 ## Locked enemy while outbound.
 var seek_target: Node2D
 ## Live homing point (enemy or player), copied once per frame before steering.
 var pathing_goal: Vector2
-## Waypoints in global coords, pruned to direction changes. Stale between repaths.
+## Waypoints in global coords, pruned to direction changes. Repathed when LOS breaks or goal moves.
 var path: PackedVector2Array
 var path_index: int = 0
 ## Sampled once per frame so tracking() and the repath trigger agree on one value.
@@ -36,8 +36,8 @@ func _ready() -> void:
 
 
 func _physics_process(delta: float) -> void:
-	Heat.set_outbound_active(state == State.OUTBOUND)
-	speed = Heat.heat
+	Kinetum.set_outbound_active(state == State.OUTBOUND)
+	speed = Kinetum.kinetum
 	_refresh_pathing_goal()
 	tracking(delta)
 	queue_redraw()
@@ -94,7 +94,7 @@ func _track_toward_goal(delta: float) -> void:
 	if has_los:
 		_steer_toward(pathing_goal, delta)
 	else:
-		if had_los:
+		if had_los or _needs_repath():
 			_get_path()
 		if not _follow(delta):
 			_steer_toward(pathing_goal, delta)
@@ -189,7 +189,7 @@ func check_parry_window() -> void:
 	elif state == State.AWAIT_PARRY and dist > parry_radius:
 		state = State.LOOSE
 		path.clear()
-		Heat.set_loose(true)
+		Kinetum.set_loose(true)
 
 	if Input.is_action_just_pressed("parry"):
 		var in_parry_range := dist <= parry_radius
@@ -198,14 +198,14 @@ func check_parry_window() -> void:
 
 
 func _do_parry() -> void:
-	Heat.parried()
+	Kinetum.parried()
 	find_target()
 	if not is_instance_valid(seek_target):
 		return
 	path.clear()
 	had_los = true
 	state = State.OUTBOUND
-	Heat.set_loose(false)
+	Kinetum.set_loose(false)
 	pathing_goal = seek_target.global_position
 	_aim_at(pathing_goal)
 #endregion
@@ -221,6 +221,13 @@ func _has_los_to(target: Vector2) -> bool:
 	query.exclude = [self]
 	var hit := space.intersect_ray(query)
 	return hit.is_empty()  # nothing between you and the target point
+
+
+## True when the live goal has moved off the current path endpoint (e.g. player moved).
+func _needs_repath() -> bool:
+	if path.is_empty() or Game.astar_grid == null:
+		return true
+	return Game.world_to_cell(pathing_goal) != Game.world_to_cell(path[-1])
 
 
 ## Rebuild `path` from the shared grid, pruned to the points where it bends.

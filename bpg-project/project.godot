@@ -11,7 +11,7 @@ config_version=5
 [application]
 
 config/name="Kinetum: Please Slow Down"
-config/description="One bullet. Parry it back. Heat makes you and the bullet faster. Please slow down."
+config/description="One bullet. Parry it back. Kinetum makes you and the bullet faster. Please slow down."
 config/version="0.0.1-proto"
 run/main_scene="uid://bbqbbygemrx4b"
 config/features=PackedStringArray("4.7", "Forward Plus")
@@ -20,7 +20,7 @@ config/icon="res://icon.svg"
 [autoload]
 
 Game="*res://autoload/game.gd"
-Heat="*res://autoload/heat.gd"
+Kinetum="*res://autoload/kinetum.gd"
 
 [display]
 
