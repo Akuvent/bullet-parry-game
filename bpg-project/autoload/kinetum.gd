@@ -27,7 +27,7 @@ func _process(delta: float) -> void:
 		kinetum += outbound_rise_per_sec * delta
 		kinetum = minf(kinetum, max_speed)
 	elif is_loose:
-		var ramp: float = 0.8
+		var ramp: float = 0.2
 		var max_mult: float = 5
 		loose_time += delta
 		dump_mult = minf(1.0 + loose_time * ramp, max_mult)
@@ -42,7 +42,6 @@ func set_loose(value: bool) -> void:
 	if value:
 		loose_time = 0.0
 		dump_mult = 1.0
-	# TODO: ramp dump multiplier while loose; clear on parry / grapple latch.
 
 
 func parried() -> void:

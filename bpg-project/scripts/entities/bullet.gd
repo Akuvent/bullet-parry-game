@@ -41,7 +41,6 @@ func _physics_process(delta: float) -> void:
 	_refresh_pathing_goal()
 	tracking(delta)
 	queue_redraw()
-	print(speed)
 
 func setup(p: Node2D) -> void:
 	player = p
