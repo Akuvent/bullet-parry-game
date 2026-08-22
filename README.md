@@ -1,6 +1,6 @@
 # Kinetum: Please Slow Down
 
-2D one-bullet parry / heat game built in **Godot 4.7**.
+2D one-bullet parry / kinetum game built in **Godot 4.7**.
 
 ## Pull the repo (other devs)
 

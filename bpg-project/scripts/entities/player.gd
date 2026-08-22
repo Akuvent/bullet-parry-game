@@ -1,5 +1,5 @@
 extends CharacterBody2D
-## Player: move (speed tied to heat) + parry on bullet return.
+## Player: move (speed tied to kinetum) + parry on bullet return.
 ## One live bullet: the instance is created with the player and added to the scene on fire.
 
 #region Config
@@ -33,8 +33,8 @@ var bullet_left: bool = true
 var was_on_floor: bool = true
 var _landing: bool = false
 var _land_timer: float = 0.0
-var heat_jump_mult: float = 1
-var max_heat_jump_mult: float = 1.5
+var kinetum_jump_mult: float = 1
+var max_kinetum_jump_mult: float = 1.5
 #endregion
 
 
@@ -65,9 +65,9 @@ func _apply_gravity_and_jump(delta: float) -> void:
 		velocity += get_gravity() * delta
 
 	if Input.is_action_just_pressed("move_up") and was_on_floor:
-		var heat_t := clampf(inverse_lerp(base_speed, Heat.max_speed, speed), 0.0, 1.0)
-		heat_jump_mult = lerpf(1.0, max_heat_jump_mult, sqrt(heat_t))
-		velocity.y = JUMP_VELOCITY * heat_jump_mult
+		var kinetum_t := clampf(inverse_lerp(base_speed, Kinetum.max_speed, speed), 0.0, 1.0)
+		kinetum_jump_mult = lerpf(1.0, max_kinetum_jump_mult, sqrt(kinetum_t))
+		velocity.y = JUMP_VELOCITY * kinetum_jump_mult
 		_landing = false
 
 

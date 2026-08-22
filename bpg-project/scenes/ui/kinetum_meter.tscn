@@ -1,0 +1,123 @@
+[gd_scene format=3 uid="uid://dfy1r03qn8xkg"]
+
+[ext_resource type="Script" uid="uid://bthx2k7cfum63" path="res://scripts/ui/kinetum_meter.gd" id="1_kinetum"]
+[ext_resource type="Shader" uid="uid://dngrw5ux8o8iv" path="res://resources/kinetum_meter.gdshader" id="2_yb3y8"]
+[ext_resource type="Shader" uid="uid://0n0e8m363jye" path="res://resources/kinetum_meter_fill.gdshader" id="2_fill"]
+[ext_resource type="Texture2D" uid="uid://dplcdspkv0caa" path="res://assets/sprites/UI/separators.png" id="3_yb3y8"]
+
+[sub_resource type="Gradient" id="Gradient_rv20d"]
+offsets = PackedFloat32Array(0, 0.33333334, 0.6666667, 1)
+colors = PackedColorArray(0.28, 0.28, 0.28, 1, 1, 0.31199998, 0.04000002, 1, 1.0372378, 0, 0, 1, 1, 1, 1, 1)
+metadata/_snap_count = 3
+metadata/_snap_enabled = true
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_yb3y8"]
+shader = ExtResource("2_yb3y8")
+shader_parameter/scroll_speed = 0.05
+shader_parameter/cell_size = 14.0
+shader_parameter/dash_length = 0.5
+shader_parameter/dash_thickness = 0.055
+shader_parameter/scatter = 0.9
+shader_parameter/gap = 0.06
+shader_parameter/darken = 0.75
+shader_parameter/grid_rotation = 0.0
+shader_parameter/move_angle = 180.0
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_fill"]
+shader = ExtResource("2_fill")
+shader_parameter/progress = 0.0
+shader_parameter/fill_skew = 0.0167
+shader_parameter/scroll_speed = 0.05
+shader_parameter/cell_size = 14.0
+shader_parameter/dash_length = 0.5
+shader_parameter/dash_thickness = 0.055
+shader_parameter/scatter = 0.9
+shader_parameter/gap = 0.06
+shader_parameter/darken = 0.75
+shader_parameter/grid_rotation = 0.0
+shader_parameter/move_angle = 180.0
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_ur6hh"]
+border_color = Color(0.805562, 0.7999747, 0.7847777, 1)
+corner_radius_top_left = 8
+corner_radius_top_right = 8
+corner_radius_bottom_right = 8
+corner_radius_bottom_left = 8
+anti_aliasing = false
+
+[sub_resource type="Gradient" id="Gradient_yb3y8"]
+colors = PackedColorArray(0.57700837, 0.5770084, 0.57700837, 1, 0.32, 0.32, 0.32, 1)
+
+[sub_resource type="GradientTexture2D" id="GradientTexture2D_ur6hh"]
+gradient = SubResource("Gradient_yb3y8")
+fill_from = Vector2(0, 1)
+
+[sub_resource type="Gradient" id="Gradient_bca1b"]
+offsets = PackedFloat32Array(0.31939164)
+colors = PackedColorArray(0, 0, 0, 0.78431374)
+
+[sub_resource type="GradientTexture2D" id="GradientTexture2D_s2q4o"]
+gradient = SubResource("Gradient_bca1b")
+width = 480
+height = 25
+fill_from = Vector2(1, 0)
+fill_to = Vector2(0, 1)
+
+[sub_resource type="Gradient" id="Gradient_44n44"]
+offsets = PackedFloat32Array(1)
+colors = PackedColorArray(1, 1, 1, 1)
+
+[sub_resource type="GradientTexture2D" id="GradientTexture2D_yb3y8"]
+gradient = SubResource("Gradient_44n44")
+width = 480
+height = 25
+
+[node name="KinetumMeter" type="Node2D" unique_id=742300823]
+script = ExtResource("1_kinetum")
+gradient = SubResource("Gradient_rv20d")
+
+[node name="PanelContainer" type="PanelContainer" parent="." unique_id=1972428613]
+clip_children = 2
+material = SubResource("ShaderMaterial_yb3y8")
+custom_minimum_size = Vector2(496, 30)
+custom_maximum_size = Vector2(496, 30)
+offset_left = -248.0
+offset_top = -16.0
+offset_right = 248.0
+offset_bottom = 14.0
+theme_override_styles/panel = SubResource("StyleBoxFlat_ur6hh")
+
+[node name="TextureRect" type="TextureRect" parent="PanelContainer" unique_id=417979891]
+use_parent_material = true
+custom_minimum_size = Vector2(500, 40)
+custom_maximum_size = Vector2(500, 40)
+layout_mode = 2
+texture = SubResource("GradientTexture2D_ur6hh")
+
+[node name="KinetumBarUnder" type="TextureRect" parent="." unique_id=1205157999]
+custom_minimum_size = Vector2(480, 25)
+custom_maximum_size = Vector2(480, 25)
+offset_left = -240.0
+offset_top = -13.0
+offset_right = 240.0
+offset_bottom = 12.0
+texture = SubResource("GradientTexture2D_s2q4o")
+
+[node name="KinetumBarFill" type="TextureRect" parent="." unique_id=1205158000]
+material = SubResource("ShaderMaterial_fill")
+custom_minimum_size = Vector2(480, 25)
+custom_maximum_size = Vector2(480, 25)
+offset_left = -240.0
+offset_top = -13.0
+offset_right = 240.0
+offset_bottom = 12.0
+texture = SubResource("GradientTexture2D_yb3y8")
+
+[node name="KinetumBarOver" type="TextureRect" parent="." unique_id=1205158001]
+custom_minimum_size = Vector2(480, 25)
+custom_maximum_size = Vector2(480, 25)
+offset_left = -240.0
+offset_top = -13.0
+offset_right = 240.0
+offset_bottom = 12.0
+texture = ExtResource("3_yb3y8")
